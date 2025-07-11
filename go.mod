@@ -3,7 +3,7 @@ module github.com/Rfluid/whatsapp-webhook-server
 go 1.23.0
 
 require (
-	github.com/Rfluid/whatsapp-cloud-api v0.1.50
+	github.com/Rfluid/whatsapp-cloud-api v0.1.51
 	github.com/gofiber/fiber/v2 v2.52.4
 )
 
@@ -18,5 +18,5 @@ require (
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/valyala/fasthttp v1.51.0 // indirect
 	github.com/valyala/tcplisten v1.0.0 // indirect
-	golang.org/x/sys v0.16.0 // indirect
+	golang.org/x/sys v0.30.0 // indirect
 )
