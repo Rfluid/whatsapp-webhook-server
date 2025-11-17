@@ -3,7 +3,7 @@ module github.com/Rfluid/whatsapp-webhook-server
 go 1.23.0
 
 require (
-	github.com/Rfluid/whatsapp-cloud-api v0.1.57
+	github.com/Rfluid/whatsapp-cloud-api v0.1.58
 	github.com/gofiber/fiber/v2 v2.52.9
 )
 
