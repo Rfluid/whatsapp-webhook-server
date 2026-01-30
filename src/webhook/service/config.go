@@ -3,7 +3,7 @@ package webhook_service
 import (
 	"sync"
 
-	wh_model "github.com/Rfluid/whatsapp-cloud-api/src/webhook/model"
+	webhook "github.com/Rfluid/whatsapp-cloud-api/src/webhook"
 	webhook_model "github.com/Rfluid/whatsapp-webhook-server/src/webhook/model"
 	"github.com/gofiber/fiber/v2"
 )
@@ -11,20 +11,20 @@ import (
 type Config struct {
 	Path            string
 	ChangeHandlers  []webhook_model.ChangeHandler
-	CtxHandler      func(ctx *fiber.Ctx, body *wh_model.WebhookBody) error
+	CtxHandler      func(ctx *fiber.Ctx, body *webhook.WebhookBody) error
 	PostMiddlewares [](func(ctx *fiber.Ctx) error)
 	GetMiddlewares  [](func(ctx *fiber.Ctx) error)
 }
 
 // Executes conccurently the change handlers for each change in each entry in the body. The entries are executed concurrently as are the changes and the change handlers.
-func (c *Config) ExecConditionally(ctx *fiber.Ctx, body *wh_model.WebhookBody) error {
+func (c *Config) ExecConditionally(ctx *fiber.Ctx, body *webhook.WebhookBody) error {
 	var err error = nil
 	var entryWg sync.WaitGroup
 	entryErrCh := make(chan error, len(body.Entry))
 
 	for _, entry := range body.Entry {
 		entryWg.Add(1)
-		go func(entry wh_model.Entry) {
+		go func(entry webhook.Entry) {
 			defer entryWg.Done()
 
 			var entryErr error = nil
@@ -33,7 +33,7 @@ func (c *Config) ExecConditionally(ctx *fiber.Ctx, body *wh_model.WebhookBody) e
 
 			for _, change := range entry.Changes {
 				changeWg.Add(1)
-				go func(change wh_model.Change) {
+				go func(change webhook.Change) {
 					defer changeWg.Done()
 
 					var changeHandlerErr error = nil
@@ -92,7 +92,7 @@ func (c *Config) ExecConditionally(ctx *fiber.Ctx, body *wh_model.WebhookBody) e
 	return err
 }
 
-func (c *Config) Exec(ctx *fiber.Ctx, body *wh_model.WebhookBody) error {
+func (c *Config) Exec(ctx *fiber.Ctx, body *webhook.WebhookBody) error {
 	err := c.CtxHandler(ctx, body)
 	if err != nil {
 		return err
@@ -105,11 +105,11 @@ func (c *Config) Exec(ctx *fiber.Ctx, body *wh_model.WebhookBody) error {
 // @Tags			Webhook
 // @Accept			json
 // @Produce		json
-// @Param			input	body	wh_model.WebhookBody	true	"Content sent by WhatsApp Cloud API."
+// @Param			input	body	webhook.WebhookBody	true	"Content sent by WhatsApp Cloud API."
 // @Success		200 "Valid webhook endpoint."
 // @Router			/{webhook_path} [post] // Change the docs adding the real path here.
 func (c *Config) Post(ctx *fiber.Ctx) error {
-	var body wh_model.WebhookBody
+	var body webhook.WebhookBody
 	if err := ctx.BodyParser(&body); err != nil {
 		return err
 	}
